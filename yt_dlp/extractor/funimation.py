@@ -23,21 +23,23 @@ class FunimationIE(InfoExtractor):
     _TOKEN = None
 
     _TESTS = [{
-        'url': 'https://www.funimation.com/shows/hacksign/role-play/',
+        'url': 'https://www.funimation.com/en/shows/sword-art-online/the-world-of-swords/',
         'info_dict': {
-            'id': '91144',
-            'display_id': 'role-play',
+            'id': '603521',
+            'display_id': 'the-world-of-swords',
             'ext': 'mp4',
-            'title': '.hack//SIGN - Role Play',
-            'description': 'md5:b602bdc15eef4c9bbb201bb6e6a4a2dd',
+            'title': 'Sword Art Online - The World of Swords',
+            'description': 'md5:28fe5511c2cd7bd333104ae50de24dcd',
             'thumbnail': r're:https?://.*\.jpg',
+            'season_number': 1,
+            'episode_number': 1,
         },
         'params': {
             # m3u8 download
             'skip_download': True,
         },
     }, {
-        'url': 'https://www.funimation.com/shows/attack-on-titan-junior-high/broadcast-dub-preview/',
+        'url': 'https://www.funimation.com/en/shows/attack-on-titan-junior-high/broadcast-dub-preview/',
         'info_dict': {
             'id': '210051',
             'display_id': 'broadcast-dub-preview',
@@ -53,8 +55,8 @@ class FunimationIE(InfoExtractor):
         'url': 'https://www.funimationnow.uk/shows/puzzle-dragons-x/drop-impact/simulcast/',
         'only_matching': True,
     }, {
-        # with lang code
-        'url': 'https://www.funimation.com/en/shows/hacksign/role-play/',
+        # without lang code
+        'url': 'https://www.funimation.com/shows/hacksign/role-play/',
         'only_matching': True,
     }]
 
