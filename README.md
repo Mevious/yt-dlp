@@ -1327,13 +1327,18 @@ $ yt-dlp --parse-metadata 'description:(?s)(?P<meta_comment>.+)' --add-metadata
 
 # EXTRACTOR ARGUMENTS
 
-Some extractors accept additional arguments which can be passed using `--extractor-args KEY:ARGS`. `ARGS` is a `;` (colon) seperated string of `ARG=VAL1,VAL2`. Eg: `--extractor-args youtube:skip=dash,hls`
+Some extractors accept additional arguments which can be passed using `--extractor-args KEY:ARGS`. `ARGS` is a `;` (colon) seperated string of `ARG=VAL1,VAL2`. Eg: `--extractor-args "youtube:skip=dash,hls" --extractor-args "funimation:version=uncut"`
 
 The following extractors use this feature:
 * **youtube**
     * `skip`: `hls` or `dash` (or both) to skip download of the respective manifests
     * `player_client`: `web`(default) or `android` (force use the android client fallbacks for video extraction)
     * `player_skip`: `configs`- skip requests if applicable for client configs and use defaults
+
+* **funimation**
+    * `language`: Languages to extract. Eg: `funimation:language=english,japanese`
+    * `version`: The video version to extract - `uncut` or `simulcast`
+
 
 # PLUGINS
 
