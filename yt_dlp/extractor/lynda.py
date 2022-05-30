@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import re
 
 from .common import InfoExtractor
@@ -21,9 +19,6 @@ class LyndaBaseIE(InfoExtractor):
     _ACCOUNT_CREDENTIALS_HINT = 'Use --username and --password options to provide lynda.com account credentials.'
     _NETRC_MACHINE = 'lynda'
 
-    def _real_initialize(self):
-        self._login()
-
     @staticmethod
     def _check_error(json_string, key_or_keys):
         keys = [key_or_keys] if isinstance(key_or_keys, compat_str) else key_or_keys
@@ -32,7 +27,7 @@ class LyndaBaseIE(InfoExtractor):
             if error:
                 raise ExtractorError('Unable to login: %s' % error, expected=True)
 
-    def _login_step(self, form_html, fallback_action_url, extra_form_data, note, referrer_url):
+    def _perform_login_step(self, form_html, fallback_action_url, extra_form_data, note, referrer_url):
         action_url = self._search_regex(
             r'<form[^>]+action=(["\'])(?P<url>.+?)\1', form_html,
             'post url', default=fallback_action_url, group='url')
@@ -55,11 +50,7 @@ class LyndaBaseIE(InfoExtractor):
 
         return response, action_url
 
-    def _login(self):
-        username, password = self._get_login_info()
-        if username is None:
-            return
-
+    def _perform_login(self, username, password):
         # Step 1: download signin page
         signin_page = self._download_webpage(
             self._SIGNIN_URL, None, 'Downloading signin page')
@@ -128,7 +119,7 @@ class LyndaIE(LyndaBaseIE):
             'Video %s is only available for members' % video_id)
 
     def _real_extract(self, url):
-        mobj = re.match(self._VALID_URL, url)
+        mobj = self._match_valid_url(url)
         video_id = mobj.group('id')
         course_id = mobj.group('course_id')
 
@@ -281,7 +272,7 @@ class LyndaCourseIE(LyndaBaseIE):
     }]
 
     def _real_extract(self, url):
-        mobj = re.match(self._VALID_URL, url)
+        mobj = self._match_valid_url(url)
         course_path = mobj.group('coursepath')
         course_id = mobj.group('courseid')
 

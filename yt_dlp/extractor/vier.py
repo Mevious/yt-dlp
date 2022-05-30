@@ -1,6 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import re
 import itertools
 
@@ -135,7 +132,7 @@ class VierIE(InfoExtractor):
             self._logged_in = True
 
     def _real_extract(self, url):
-        mobj = re.match(self._VALID_URL, url)
+        mobj = self._match_valid_url(url)
         embed_id = mobj.group('embed_id')
         display_id = mobj.group('display_id') or embed_id
         video_id = mobj.group('id') or embed_id
@@ -234,7 +231,7 @@ class VierVideosIE(InfoExtractor):
     }]
 
     def _real_extract(self, url):
-        mobj = re.match(self._VALID_URL, url)
+        mobj = self._match_valid_url(url)
         program = mobj.group('program')
         site = mobj.group('site')
 

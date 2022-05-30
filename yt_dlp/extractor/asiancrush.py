@@ -1,6 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import functools
 import re
 
@@ -111,7 +108,7 @@ class AsianCrushIE(AsianCrushBaseIE):
     }]
 
     def _real_extract(self, url):
-        host, video_id = re.match(self._VALID_URL, url).groups()
+        host, video_id = self._match_valid_url(url).groups()
 
         if host == 'cocoro.tv':
             webpage = self._download_webpage(url, video_id)
@@ -161,7 +158,7 @@ class AsianCrushPlaylistIE(AsianCrushBaseIE):
             yield self._parse_video_data(video)
 
     def _real_extract(self, url):
-        host, playlist_id = re.match(self._VALID_URL, url).groups()
+        host, playlist_id = self._match_valid_url(url).groups()
 
         if host == 'cocoro.tv':
             webpage = self._download_webpage(url, playlist_id)
@@ -181,8 +178,7 @@ class AsianCrushPlaylistIE(AsianCrushBaseIE):
                 'title', default=None) or self._og_search_title(
                 webpage, default=None) or self._html_search_meta(
                 'twitter:title', webpage, 'title',
-                default=None) or self._search_regex(
-                r'<title>([^<]+)</title>', webpage, 'title', fatal=False)
+                default=None) or self._html_extract_title(webpage)
             if title:
                 title = re.sub(r'\s*\|\s*.+?$', '', title)
 

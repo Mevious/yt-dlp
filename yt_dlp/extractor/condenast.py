@@ -1,6 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import re
 
 from .common import InfoExtractor
@@ -222,7 +219,7 @@ class CondeNastIE(InfoExtractor):
         }
 
     def _real_extract(self, url):
-        video_id, player_id, target, url_type, display_id = re.match(self._VALID_URL, url).groups()
+        video_id, player_id, target, url_type, display_id = self._match_valid_url(url).groups()
 
         if video_id:
             return self._extract_video({

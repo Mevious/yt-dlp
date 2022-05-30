@@ -1,8 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
-import re
-
 from .common import InfoExtractor
 from ..utils import (
     clean_html,
@@ -42,7 +37,7 @@ class LibsynIE(InfoExtractor):
     }]
 
     def _real_extract(self, url):
-        url, video_id = re.match(self._VALID_URL, url).groups()
+        url, video_id = self._match_valid_url(url).groups()
         webpage = self._download_webpage(url, video_id)
 
         data = self._parse_json(self._search_regex(

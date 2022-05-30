@@ -1,6 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import re
 
 from .common import InfoExtractor
@@ -67,7 +64,7 @@ class MSNIE(InfoExtractor):
     }]
 
     def _real_extract(self, url):
-        display_id, page_id = re.match(self._VALID_URL, url).groups()
+        display_id, page_id = self._match_valid_url(url).groups()
 
         webpage = self._download_webpage(url, display_id)
 

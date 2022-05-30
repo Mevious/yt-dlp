@@ -1,8 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
-import re
-
 from .common import InfoExtractor
 from ..compat import compat_HTTPError
 from ..utils import (
@@ -25,9 +20,6 @@ class AtresPlayerIE(InfoExtractor):
                 'description': 'md5:7634cdcb4d50d5381bedf93efb537fbc',
                 'duration': 3413,
             },
-            'params': {
-                'format': 'bestvideo',
-            },
             'skip': 'This video is only available for registered users'
         },
         {
@@ -41,9 +33,6 @@ class AtresPlayerIE(InfoExtractor):
     ]
     _API_BASE = 'https://api.atresplayer.com/'
 
-    def _real_initialize(self):
-        self._login()
-
     def _handle_error(self, e, code):
         if isinstance(e.cause, compat_HTTPError) and e.cause.code == code:
             error = self._parse_json(e.cause.read(), None)
@@ -52,11 +41,7 @@ class AtresPlayerIE(InfoExtractor):
             raise ExtractorError(error['error_description'], expected=True)
         raise
 
-    def _login(self):
-        username, password = self._get_login_info()
-        if username is None:
-            return
-
+    def _perform_login(self, username, password):
         self._request_webpage(
             self._API_BASE + 'login', None, 'Downloading login page')
 
@@ -75,7 +60,7 @@ class AtresPlayerIE(InfoExtractor):
         self._request_webpage(target_url, None, 'Following Target URL')
 
     def _real_extract(self, url):
-        display_id, video_id = re.match(self._VALID_URL, url).groups()
+        display_id, video_id = self._match_valid_url(url).groups()
 
         try:
             episode = self._download_json(

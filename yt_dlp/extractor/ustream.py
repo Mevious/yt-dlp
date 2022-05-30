@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import random
 import re
 
@@ -13,6 +11,7 @@ from ..utils import (
     ExtractorError,
     int_or_none,
     float_or_none,
+    join_nonempty,
     mimetype2ext,
     str_or_none,
 )
@@ -139,8 +138,8 @@ class UstreamIE(InfoExtractor):
             content_type = stream['contentType']
             kind = content_type.split('/')[0]
             f = {
-                'format_id': '-'.join(filter(None, [
-                    'dash', kind, str_or_none(stream.get('bitrate'))])),
+                'format_id': join_nonempty(
+                    'dash', kind, str_or_none(stream.get('bitrate'))),
                 'protocol': 'http_dash_segments',
                 # TODO: generate a MPD doc for external players?
                 'url': encode_data_uri(b'<MPD/>', 'text/xml'),
@@ -165,7 +164,7 @@ class UstreamIE(InfoExtractor):
         return formats
 
     def _real_extract(self, url):
-        m = re.match(self._VALID_URL, url)
+        m = self._match_valid_url(url)
         video_id = m.group('id')
 
         # some sites use this embed format (see: https://github.com/ytdl-org/youtube-dl/issues/2990)
@@ -258,7 +257,7 @@ class UstreamChannelIE(InfoExtractor):
     }
 
     def _real_extract(self, url):
-        m = re.match(self._VALID_URL, url)
+        m = self._match_valid_url(url)
         display_id = m.group('slug')
         webpage = self._download_webpage(url, display_id)
         channel_id = self._html_search_meta('ustream:channel_id', webpage)

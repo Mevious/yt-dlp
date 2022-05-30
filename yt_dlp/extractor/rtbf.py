@@ -1,6 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import re
 
 from .common import InfoExtractor
@@ -68,7 +65,7 @@ class RTBFIE(InfoExtractor):
     ]
 
     def _real_extract(self, url):
-        live, media_id = re.match(self._VALID_URL, url).groups()
+        live, media_id = self._match_valid_url(url).groups()
         embed_page = self._download_webpage(
             'https://www.rtbf.be/auvio/embed/' + ('direct' if live else 'media'),
             media_id, query={'id': media_id})
@@ -85,8 +82,6 @@ class RTBFIE(InfoExtractor):
 
         title = data['title']
         is_live = data.get('isLive')
-        if is_live:
-            title = self._live_title(title)
         height_re = r'-(\d+)p\.'
         formats = []
 

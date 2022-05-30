@@ -1,26 +1,21 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import threading
 
+from . import get_suitable_downloader
 from .common import FileDownloader
-from ..downloader import _get_real_downloader
-from ..extractor.niconico import NiconicoIE
-from ..compat import compat_urllib_request
+from ..utils import sanitized_Request
 
 
 class NiconicoDmcFD(FileDownloader):
     """ Downloading niconico douga from DMC with heartbeat """
 
-    FD_NAME = 'niconico_dmc'
-
     def real_download(self, filename, info_dict):
-        self.to_screen('[%s] Downloading from DMC' % self.FD_NAME)
+        from ..extractor.niconico import NiconicoIE
 
+        self.to_screen('[%s] Downloading from DMC' % self.FD_NAME)
         ie = NiconicoIE(self.ydl)
         info_dict, heartbeat_info_dict = ie._get_heartbeat_info(info_dict)
 
-        fd = _get_real_downloader(info_dict, params=self.params)(self.ydl, self.params)
+        fd = get_suitable_downloader(info_dict, params=self.params)(self.ydl, self.params)
 
         success = download_complete = False
         timer = [None]
@@ -29,9 +24,11 @@ class NiconicoDmcFD(FileDownloader):
         heartbeat_data = heartbeat_info_dict['data'].encode()
         heartbeat_interval = heartbeat_info_dict.get('interval', 30)
 
+        request = sanitized_Request(heartbeat_url, heartbeat_data)
+
         def heartbeat():
             try:
-                compat_urllib_request.urlopen(url=heartbeat_url, data=heartbeat_data)
+                self.ydl.urlopen(request).read()
             except Exception:
                 self.to_screen('[%s] Heartbeat failed' % self.FD_NAME)
 
@@ -52,4 +49,4 @@ class NiconicoDmcFD(FileDownloader):
                 with heartbeat_lock:
                     timer[0].cancel()
                     download_complete = True
-            return success
+        return success

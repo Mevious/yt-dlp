@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import re
 
 from .common import InfoExtractor
@@ -149,7 +147,7 @@ class GDCVaultIE(InfoExtractor):
         return start_page
 
     def _real_extract(self, url):
-        video_id, name = re.match(self._VALID_URL, url).groups()
+        video_id, name = self._match_valid_url(url).groups()
         display_id = name or video_id
 
         webpage_url = 'http://www.gdcvault.com/play/' + video_id

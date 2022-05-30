@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import re
 import json
 
@@ -94,7 +92,7 @@ class AppleTrailersIE(InfoExtractor):
     _JSON_RE = r'iTunes.playURL\((.*?)\);'
 
     def _real_extract(self, url):
-        mobj = re.match(self._VALID_URL, url)
+        mobj = self._match_valid_url(url)
         movie = mobj.group('movie')
         uploader_id = mobj.group('company')
 

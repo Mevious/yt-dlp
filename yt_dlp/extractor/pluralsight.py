@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import collections
 import json
 import os
@@ -17,6 +15,7 @@ from ..utils import (
     float_or_none,
     int_or_none,
     parse_duration,
+    parse_qs,
     qualities,
     srt_subtitles_timecode,
     try_get,
@@ -161,14 +160,7 @@ query viewClip {
   }
 }'''
 
-    def _real_initialize(self):
-        self._login()
-
-    def _login(self):
-        username, password = self._get_login_info()
-        if username is None:
-            return
-
+    def _perform_login(self, username, password):
         login_page = self._download_webpage(
             self._LOGIN_URL, None, 'Downloading login page')
 
@@ -273,7 +265,7 @@ query viewClip {
         return srt
 
     def _real_extract(self, url):
-        qs = compat_urlparse.parse_qs(compat_urlparse.urlparse(url).query)
+        qs = parse_qs(url)
 
         author = qs.get('author', [None])[0]
         name = qs.get('name', [None])[0]

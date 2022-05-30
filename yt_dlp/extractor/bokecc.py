@@ -1,8 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
-import re
-
 from .common import InfoExtractor
 from ..compat import compat_parse_qs
 from ..utils import ExtractorError
@@ -45,7 +40,7 @@ class BokeCCIE(BokeCCBaseIE):
     }]
 
     def _real_extract(self, url):
-        qs = compat_parse_qs(re.match(self._VALID_URL, url).group('query'))
+        qs = compat_parse_qs(self._match_valid_url(url).group('query'))
         if not qs.get('vid') or not qs.get('uid'):
             raise ExtractorError('Invalid URL', expected=True)
 

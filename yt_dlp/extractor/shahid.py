@@ -1,6 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import json
 import math
 import re
@@ -79,16 +76,12 @@ class ShahidIE(ShahidBaseIE):
         'only_matching': True
     }]
 
-    def _real_initialize(self):
-        email, password = self._get_login_info()
-        if email is None:
-            return
-
+    def _perform_login(self, username, password):
         try:
             user_data = self._download_json(
                 'https://shahid.mbc.net/wd/service/users/login',
                 None, 'Logging in', data=json.dumps({
-                    'email': email,
+                    'email': username,
                     'password': password,
                     'basic': 'false',
                 }).encode('utf-8'), headers={
@@ -111,7 +104,7 @@ class ShahidIE(ShahidBaseIE):
             }))
 
     def _real_extract(self, url):
-        page_type, video_id = re.match(self._VALID_URL, url).groups()
+        page_type, video_id = self._match_valid_url(url).groups()
         if page_type == 'clip':
             page_type = 'episode'
 
@@ -119,7 +112,7 @@ class ShahidIE(ShahidBaseIE):
             'playout/new/url/' + video_id, video_id)['playout']
 
         if not self.get_param('allow_unplayable_formats') and playout.get('drm'):
-            raise ExtractorError('This video is DRM protected.', expected=True)
+            self.report_drm(video_id)
 
         formats = self._extract_m3u8_formats(re.sub(
             # https://docs.aws.amazon.com/mediapackage/latest/ug/manifest-filtering.html

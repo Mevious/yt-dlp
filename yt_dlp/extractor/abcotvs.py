@@ -1,8 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
-import re
-
 from .common import InfoExtractor
 from ..compat import compat_str
 from ..utils import (
@@ -55,7 +50,7 @@ class ABCOTVSIE(InfoExtractor):
     }
 
     def _real_extract(self, url):
-        site, display_id, video_id = re.match(self._VALID_URL, url).groups()
+        site, display_id, video_id = self._match_valid_url(url).groups()
         display_id = display_id or video_id
         station = self._SITE_MAP[site]
 

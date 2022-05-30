@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import os
 import re
 import subprocess
@@ -8,9 +6,10 @@ import time
 from .common import FileDownloader
 from ..compat import compat_str
 from ..utils import (
+    Popen,
     check_executable,
-    encodeFilename,
     encodeArgument,
+    encodeFilename,
     get_exe_version,
 )
 
@@ -26,7 +25,7 @@ class RtmpFD(FileDownloader):
             start = time.time()
             resume_percent = None
             resume_downloaded_data_len = None
-            proc = subprocess.Popen(args, stderr=subprocess.PIPE)
+            proc = Popen(args, stderr=subprocess.PIPE)
             cursor_in_new_line = True
             proc_stderr_closed = False
             try:
@@ -66,7 +65,7 @@ class RtmpFD(FileDownloader):
                             'eta': eta,
                             'elapsed': time_now - start,
                             'speed': speed,
-                        })
+                        }, info_dict)
                         cursor_in_new_line = False
                     else:
                         # no percent for live streams
@@ -82,7 +81,7 @@ class RtmpFD(FileDownloader):
                                 'status': 'downloading',
                                 'elapsed': time_now - start,
                                 'speed': speed,
-                            })
+                            }, info_dict)
                             cursor_in_new_line = False
                         elif self.params.get('verbose', False):
                             if not cursor_in_new_line:
@@ -208,7 +207,7 @@ class RtmpFD(FileDownloader):
                 'filename': filename,
                 'status': 'finished',
                 'elapsed': time.time() - started,
-            })
+            }, info_dict)
             return True
         else:
             self.to_stderr('\n')

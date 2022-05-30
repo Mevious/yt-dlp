@@ -1,6 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import re
 
 from .common import InfoExtractor
@@ -15,14 +12,14 @@ from ..utils import (
 class WimTVIE(InfoExtractor):
     _player = None
     _UUID_RE = r'[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}'
-    _VALID_URL = r'''(?x)
+    _VALID_URL = r'''(?x:
         https?://platform.wim.tv/
         (?:
             (?:embed/)?\?
             |\#/webtv/.+?/
         )
         (?P<type>vod|live|cast)[=/]
-        (?P<id>%s).*?''' % _UUID_RE
+        (?P<id>%s).*?)''' % _UUID_RE
     _TESTS = [{
         # vod stream
         'url': 'https://platform.wim.tv/embed/?vod=db29fb32-bade-47b6-a3a6-cb69fe80267a',
@@ -119,7 +116,7 @@ class WimTVIE(InfoExtractor):
             thumb_id, width)
 
     def _real_extract(self, url):
-        urlc = re.match(self._VALID_URL, url).groupdict()
+        urlc = self._match_valid_url(url).groupdict()
         video_id = urlc['id']
         stream_type = is_live = None
         if urlc['type'] in {'live', 'cast'}:

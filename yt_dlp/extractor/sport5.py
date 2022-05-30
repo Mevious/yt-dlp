@@ -1,8 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
-import re
-
 from .common import InfoExtractor
 from ..utils import ExtractorError
 
@@ -36,7 +31,7 @@ class Sport5IE(InfoExtractor):
     ]
 
     def _real_extract(self, url):
-        mobj = re.match(self._VALID_URL, url)
+        mobj = self._match_valid_url(url)
         media_id = mobj.group('id')
 
         webpage = self._download_webpage(url, media_id)

@@ -1,6 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import re
 
 from .common import InfoExtractor
@@ -42,8 +39,7 @@ class AluraIE(InfoExtractor):
 
     def _real_extract(self, url):
 
-        video_id = self._match_id(url)
-        course = self._search_regex(self._VALID_URL, url, 'post url', group='course_name')
+        course, video_id = self._match_valid_url(url)
         video_url = self._VIDEO_URL % (course, video_id)
 
         video_dict = self._download_json(video_url, video_id, 'Searching for videos')
@@ -75,14 +71,7 @@ class AluraIE(InfoExtractor):
                 "formats": formats
             }
 
-    def _real_initialize(self):
-        self._login()
-
-    def _login(self):
-        username, password = self._get_login_info()
-        if username is None:
-            return
-        pass
+    def _perform_login(self, username, password):
 
         login_page = self._download_webpage(
             self._LOGIN_URL, None, 'Downloading login popup')

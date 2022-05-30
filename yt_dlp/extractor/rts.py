@@ -1,6 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import re
 
 from .srgssr import SRGSSRIE
@@ -116,7 +113,7 @@ class RTSIE(SRGSSRIE):
     ]
 
     def _real_extract(self, url):
-        m = re.match(self._VALID_URL, url)
+        m = self._match_valid_url(url)
         media_id = m.group('rts_id') or m.group('id')
         display_id = m.group('display_id') or media_id
 

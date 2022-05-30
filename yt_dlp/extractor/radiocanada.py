@@ -1,8 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
-import re
-
 from .common import InfoExtractor
 from ..compat import compat_HTTPError
 from ..utils import (
@@ -143,7 +138,7 @@ class RadioCanadaIE(InfoExtractor):
         }
 
     def _real_extract(self, url):
-        return self._extract_info(*re.match(self._VALID_URL, url).groups())
+        return self._extract_info(*self._match_valid_url(url).groups())
 
 
 class RadioCanadaAudioVideoIE(InfoExtractor):

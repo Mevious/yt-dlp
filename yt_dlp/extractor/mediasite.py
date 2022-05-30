@@ -1,6 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import re
 import json
 
@@ -14,6 +11,7 @@ from ..utils import (
     float_or_none,
     mimetype2ext,
     str_or_none,
+    try_call,
     try_get,
     unescapeHTML,
     unsmuggle_url,
@@ -145,11 +143,11 @@ class MediasiteIE(InfoExtractor):
                             'duration': slide['Time'] / 1000,
                         })
 
-            next_time = try_get(None, [
-                lambda _: Stream['Slides'][i + 1]['Time'],
-                lambda _: duration,
-                lambda _: slide['Time'],
-            ], expected_type=(int, float))
+            next_time = try_call(
+                lambda: Stream['Slides'][i + 1]['Time'],
+                lambda: duration,
+                lambda: slide['Time'],
+                expected_type=(int, float))
 
             fragments.append({
                 'path': fname_template.format(slide.get('Number', i + 1)),
@@ -170,7 +168,7 @@ class MediasiteIE(InfoExtractor):
 
     def _real_extract(self, url):
         url, data = unsmuggle_url(url, {})
-        mobj = re.match(self._VALID_URL, url)
+        mobj = self._match_valid_url(url)
         resource_id = mobj.group('id')
         query = mobj.group('query')
 
@@ -327,7 +325,7 @@ class MediasiteCatalogIE(InfoExtractor):
     }]
 
     def _real_extract(self, url):
-        mobj = re.match(self._VALID_URL, url)
+        mobj = self._match_valid_url(url)
         mediasite_url = mobj.group('url')
         catalog_id = mobj.group('catalog_id')
         current_folder_id = mobj.group('current_folder_id') or catalog_id
@@ -403,7 +401,7 @@ class MediasiteNamedCatalogIE(InfoExtractor):
     }]
 
     def _real_extract(self, url):
-        mobj = re.match(self._VALID_URL, url)
+        mobj = self._match_valid_url(url)
         mediasite_url = mobj.group('url')
         catalog_name = mobj.group('catalog_name')
 

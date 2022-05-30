@@ -1,16 +1,12 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import re
 
 from .common import InfoExtractor
 from ..compat import (
-    compat_parse_qs,
     compat_str,
-    compat_urllib_parse_urlparse,
 )
 from ..utils import (
     int_or_none,
+    parse_qs,
 )
 
 
@@ -144,9 +140,9 @@ class VideomoreIE(InfoExtractor):
             return mobj.group('url')
 
     def _real_extract(self, url):
-        mobj = re.match(self._VALID_URL, url)
+        mobj = self._match_valid_url(url)
         video_id = mobj.group('sid') or mobj.group('id')
-        partner_id = mobj.group('partner_id') or compat_parse_qs(compat_urllib_parse_urlparse(url).query).get('partner_id', [None])[0] or '97'
+        partner_id = mobj.group('partner_id') or parse_qs(url).get('partner_id', [None])[0] or '97'
 
         item = self._download_json(
             'https://siren.more.tv/player/config', video_id, query={

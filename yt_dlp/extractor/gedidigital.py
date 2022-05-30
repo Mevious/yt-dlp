@@ -1,6 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import re
 
 from .common import InfoExtractor
@@ -14,7 +11,7 @@ from ..utils import (
 
 
 class GediDigitalIE(InfoExtractor):
-    _VALID_URL = r'''(?x)(?P<url>(?:https?:)//video\.
+    _VALID_URL = r'''(?x:(?P<url>(?:https?:)//video\.
         (?:
             (?:
                 (?:espresso\.)?repubblica
@@ -36,7 +33,7 @@ class GediDigitalIE(InfoExtractor):
                 |corrierealpi
                 |lasentinella
             )\.gelocal
-        )\.it(?:/[^/]+){2,4}/(?P<id>\d+))(?:$|[?&].*)'''
+        )\.it(?:/[^/]+){2,4}/(?P<id>\d+))(?:$|[?&].*))'''
     _TESTS = [{
         'url': 'https://video.lastampa.it/politica/il-paradosso-delle-regionali-la-lega-vince-ma-sembra-aver-perso/121559/121683',
         'md5': '84658d7fb9e55a6e57ecc77b73137494',
@@ -143,7 +140,7 @@ class GediDigitalIE(InfoExtractor):
 
     def _real_extract(self, url):
         video_id = self._match_id(url)
-        url = re.match(self._VALID_URL, url).group('url')
+        url = self._match_valid_url(url).group('url')
         webpage = self._download_webpage(url, video_id)
         title = self._html_search_meta(
             ['twitter:title', 'og:title'], webpage, fatal=True)

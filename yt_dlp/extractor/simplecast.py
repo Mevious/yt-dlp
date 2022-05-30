@@ -1,6 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import re
 
 from .common import InfoExtractor
@@ -122,7 +119,7 @@ class SimplecastEpisodeIE(SimplecastBaseIE):
     }
 
     def _real_extract(self, url):
-        mobj = re.match(self._VALID_URL, url)
+        mobj = self._match_valid_url(url)
         episode = self._call_search_api(
             'episode', mobj.group(1), mobj.group(0))
         return self._parse_episode(episode)

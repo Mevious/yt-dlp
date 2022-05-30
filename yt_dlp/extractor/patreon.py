@@ -1,5 +1,4 @@
-# coding: utf-8
-from __future__ import unicode_literals
+import itertools
 
 from .common import InfoExtractor
 from .vimeo import VimeoIE
@@ -14,7 +13,7 @@ from ..utils import (
     parse_iso8601,
     str_or_none,
     try_get,
-    url_or_none
+    url_or_none,
 )
 
 
@@ -86,11 +85,7 @@ class PatreonIE(InfoExtractor):
     # Currently Patreon exposes download URL via hidden CSS, so login is not
     # needed. Keeping this commented for when this inevitably changes.
     '''
-    def _login(self):
-        username, password = self._get_login_info()
-        if username is None:
-            return
-
+    def _perform_login(self, username, password):
         login_form = {
             'redirectUrl': 'http://www.patreon.com/',
             'email': username,
@@ -106,8 +101,6 @@ class PatreonIE(InfoExtractor):
         if re.search(r'onLoginFailed', login_page):
             raise ExtractorError('Unable to login, incorrect username and/or password', expected=True)
 
-    def _real_initialize(self):
-        self._login()
     '''
 
     def _real_extract(self, url):
@@ -159,7 +152,7 @@ class PatreonIE(InfoExtractor):
             if try_get(attributes, lambda x: x['embed']['provider']) == 'Vimeo':
                 embed_html = try_get(attributes, lambda x: x['embed']['html'])
                 v_url = url_or_none(compat_urllib_parse_unquote(
-                    self._search_regex(r'src=(https%3A%2F%2Fplayer\.vimeo\.com.+)%3F', embed_html, 'vimeo url', fatal=False)))
+                    self._search_regex(r'(https(?:%3A%2F%2F|://)player\.vimeo\.com.+app_id(?:=|%3D)+\d+)', embed_html, 'vimeo url', fatal=False)))
                 if v_url:
                     info.update({
                         '_type': 'url_transparent',
@@ -185,3 +178,56 @@ class PatreonIE(InfoExtractor):
                 })
 
         return info
+
+
+class PatreonUserIE(InfoExtractor):
+
+    _VALID_URL = r'https?://(?:www\.)?patreon\.com/(?!rss)(?P<id>[-\w]+)'
+
+    _TESTS = [{
+        'url': 'https://www.patreon.com/dissonancepod/',
+        'info_dict': {
+            'title': 'dissonancepod',
+        },
+        'playlist_mincount': 68,
+        'expected_warnings': 'Post not viewable by current user! Skipping!',
+    }, {
+        'url': 'https://www.patreon.com/dissonancepod/posts',
+        'only_matching': True
+    }, ]
+
+    @classmethod
+    def suitable(cls, url):
+        return False if PatreonIE.suitable(url) else super(PatreonUserIE, cls).suitable(url)
+
+    def _entries(self, campaign_id, user_id):
+        cursor = None
+        params = {
+            'fields[campaign]': 'show_audio_post_download_links,name,url',
+            'fields[post]': 'current_user_can_view,embed,image,is_paid,post_file,published_at,patreon_url,url,post_type,thumbnail_url,title',
+            'filter[campaign_id]': campaign_id,
+            'filter[is_draft]': 'false',
+            'sort': '-published_at',
+            'json-api-version': 1.0,
+            'json-api-use-default-includes': 'false',
+        }
+
+        for page in itertools.count(1):
+
+            params.update({'page[cursor]': cursor} if cursor else {})
+            posts_json = self._download_json('https://www.patreon.com/api/posts', user_id, note='Downloading posts page %d' % page, query=params, headers={'Cookie': '.'})
+
+            cursor = try_get(posts_json, lambda x: x['meta']['pagination']['cursors']['next'])
+
+            for post in posts_json.get('data') or []:
+                yield self.url_result(url_or_none(try_get(post, lambda x: x['attributes']['patreon_url'])), 'Patreon')
+
+            if cursor is None:
+                break
+
+    def _real_extract(self, url):
+
+        user_id = self._match_id(url)
+        webpage = self._download_webpage(url, user_id, headers={'Cookie': '.'})
+        campaign_id = self._search_regex(r'https://www.patreon.com/api/campaigns/(\d+)/?', webpage, 'Campaign ID')
+        return self.playlist_result(self._entries(campaign_id, user_id), playlist_title=user_id)
